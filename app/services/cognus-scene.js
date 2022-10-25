@@ -9,7 +9,7 @@ import * as dat from 'dat.gui';
 export default class CognusSceneService extends Service {
   config = {
     resizeCamera: true,
-    gui: true,
+    gui: false,
   };
 
   @tracked cameras = [];
