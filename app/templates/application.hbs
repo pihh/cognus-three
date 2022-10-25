@@ -1,7 +1,30 @@
-{{page-title "BluedarwinTheMovie"}}
+<CognusScene>
+  <Three::Camera::Perspective
+    @fov={{75}}
+    @position={{this.cameraPosition}}
+    @far={{100}}
+  />
 
-{{!-- The following component displays Ember's default welcome message. --}}
-<WelcomePage />
-{{!-- Feel free to remove this! --}}
+  <Three::Light::Point
+    @intensity={{0.1}}
+    @position={{this.pointLightPosition}}
+  />
+  <Three::Light::Point
+    @color={{this.pointLightColor2}}
+    @intensity={{2}}
+    @position={{this.pointLightPosition2}}
+  />
+  <Three::Light::Point
+    @intensity={{10}}
+    @position={{this.pointLightPosition3}}
+  />
 
-{{outlet}}
+  {{!
+  <Objects::Ball />
+  }}
+  <Objects::Sphere />
+
+</CognusScene>
+{{! <Three::Controls::Orbit />}}
+
+<h1>Title</h1>
