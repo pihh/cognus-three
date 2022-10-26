@@ -2,32 +2,27 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { service } from '@ember/service';
-import { PointLight, PointLightHelper } from 'three';
+import { DirectionalLight, DirectionalLightHelper } from 'three';
 
-export default class ThreeLightPointComponent extends Component {
+export default class ThreeLightDirectionalComponent extends Component {
   @service cognusScene;
 
   @action
   didInsert() {
-    const pointLight = new PointLight(
-      this.color,
-      this.intensity,
-      this.distance,
-      this.decay
-    );
+    const light = new DirectionalLight(this.color, this.intensity);
 
-    pointLight.position.x = this.position.x;
-    pointLight.position.y = this.position.y;
-    pointLight.position.z = this.position.z;
+    light.position.x = this.position.x;
+    light.position.y = this.position.y;
+    light.position.z = this.position.z;
 
-    pointLight.castShadow = this.castShadow;
+    light.castShadow = this.castShadow;
 
     this.cognusScene.addComponent({
       type: 'lights',
-      object: pointLight,
+      object: light,
       color: this.color,
       helper() {
-        return new PointLightHelper(pointLight, 2);
+        return new DirectionalLightHelper(light, 5);
       },
     });
   }
@@ -38,13 +33,6 @@ export default class ThreeLightPointComponent extends Component {
 
   get intensity() {
     return this.args.intensity || 1;
-  }
-  get distance() {
-    return this.args.distance || 0;
-  }
-
-  get decay() {
-    return this.args.decay || 2;
   }
 
   get position() {

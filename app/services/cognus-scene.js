@@ -2,7 +2,14 @@ import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
-import { WebGLRenderer, Clock, Raycaster, Vector2 } from 'three';
+import {
+  WebGLRenderer,
+  Clock,
+  Raycaster,
+  Vector2,
+  PCFSoftShadowMap,
+  AxesHelper,
+} from 'three';
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
 
@@ -31,7 +38,6 @@ export default class CognusSceneService extends Service {
         component.init();
       }
       this.scene.add(component.object);
-      console.log(this);
     }
   }
 
@@ -41,43 +47,39 @@ export default class CognusSceneService extends Service {
     this.scene = this.scenes[0].object;
     this.camera = this.cameras[0].object;
 
+    this.addRenderer();
+    this.addCamera();
     this.addLights();
     this.addObjects();
-    this.addCamera();
-    this.addRenderer();
+
     this.addControls();
     this.addRaycaster();
     this.animate();
 
     this.addEventListeners();
     this.addGUI();
-
-    console.log(this.objects);
   }
 
   addGUI() {
     if (this.config.gui) {
       this.gui = new dat.GUI();
-
+      this.scene.add(new AxesHelper(10));
       for (let [i, light] of this.lights.entries()) {
-        const folder = this.gui.addFolder('light ' + i);
-        const folderColor = {
-          color: light.color,
-        };
-        folder.add(light.object.position, 'x').min(-10).max(10).step(0.01);
-        folder.add(light.object.position, 'y').min(-10).max(10).step(0.01);
-        folder.add(light.object.position, 'z').min(-10).max(10).step(0.01);
-        folder.add(light.object, 'intensity').min(0).max(10).step(0.01);
+        if (light.helper) {
+          const folder = this.gui.addFolder('light ' + i);
+          const folderColor = {
+            color: light.color,
+          };
+          folder.add(light.object.position, 'x').min(-200).max(200).step(0.01);
+          folder.add(light.object.position, 'y').min(-200).max(200).step(0.01);
+          folder.add(light.object.position, 'z').min(-200).max(200).step(0.01);
+          folder.add(light.object, 'intensity').min(0).max(10).step(0.01);
 
-        folder.addColor(folderColor, 'color').onChange(() => {
-          light.object.color.set(folderColor.color);
-          console.log('inChange', light.object.color);
-        });
+          folder.addColor(folderColor, 'color').onChange(() => {
+            light.object.color.set(folderColor.color);
+          });
 
-        try {
           this.scene.add(light.helper());
-        } catch (ex) {
-          console.warn(ex);
         }
       }
     }
@@ -116,9 +118,12 @@ export default class CognusSceneService extends Service {
     this.renderer = new WebGLRenderer({
       canvas: this.canvas,
       alpha: true,
+      antialias: true,
     });
     this.renderer.setSize(this.sizes.width, this.sizes.height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = PCFSoftShadowMap;
   }
 
   addRaycaster() {
@@ -160,7 +165,7 @@ export default class CognusSceneService extends Service {
   }
 
   addEventListeners() {
-    this.renderer.domElement.addEventListener('resize', () => {
+    window.addEventListener('resize', () => {
       this.onResize();
     });
 
@@ -214,7 +219,9 @@ export default class CognusSceneService extends Service {
         const objUUID = object.object.uuid;
         if (meshUUID == objUUID) {
           object.object.intersected = true;
-          this.intersects[0].object.hover(e);
+          if (this.intersects[0].object.hover) {
+            this.intersects[0].object.hover(e);
+          }
         } else {
           object.object.intersected = false;
         }
@@ -237,7 +244,9 @@ export default class CognusSceneService extends Service {
 
   onClick(e) {
     if (this.intersects.length > 0) {
-      this.intersects[0].object.click(e);
+      if (this.intersects[0].object.click) {
+        this.intersects[0].object.click(e);
+      }
     } else {
       for (let object of this.objects) {
         if (object.clickOutside) {

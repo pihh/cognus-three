@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { service } from '@ember/service';
-import { AmbientLight, AmbientLightHelper } from 'three';
+import { AmbientLight } from 'three';
 
 export default class ThreeLightAmbientComponent extends Component {
   @service cognusScene;
@@ -19,9 +19,6 @@ export default class ThreeLightAmbientComponent extends Component {
       type: 'lights',
       object: ambientLight,
       color: this.color,
-      helper() {
-        return new AmbientLightHelper(ambientLight, 2);
-      },
     });
   }
 

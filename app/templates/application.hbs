@@ -1,25 +1,34 @@
 <CognusScene>
   <Three::Camera::Perspective
-    @fov={{75}}
+    @fov={{50}}
     @position={{this.cameraPosition}}
-    @far={{100}}
+    @far={{1000}}
   />
 
-  <Three::Light::Ambient @intensity={{1}} />
-  {{!-- <Three::Light::Point @intensity={{1}} @position={{this.pointLightPosition}} />
-  {{!--
-  <Three::Light::Point
-    @color={{this.pointLightColor2}}
-    @intensity={{2}}
-    @position={{this.pointLightPosition2}}
+  <Three::Light::Ambient @intensity={{0.5}} />
+  <Three::Light::Spot
+    @intensity={{0.5}}
+    @angle={{0.1}}
+    @penumbra={{1}}
+    @position={{this.spotLightPosition}}
+    @castShadow={{true}}
   />
-  <Three::Light::Point
-    @intensity={{10}}
-    @position={{this.pointLightPosition3}}
-  />
-  --}}
 
-  {{! <Objects::Sphere /> }}
+  <Three::Light::Spot
+    @intensity={{0.5}}
+    @angle={{0.1}}
+    @penumbra={{1}}
+    @position={{this.spotLight2Position}}
+    @castShadow={{true}}
+  />
+
   <Objects::Shoe />
+  <Objects::Ground />
+  <Objects::Environment />
 </CognusScene>
-<Three::Controls::Orbit />
+<Three::Controls::Orbit
+  @minPolarAngle={{this.minPolarAngle}}
+  @maxPolarAngle={{this.maxPolarAngle}}
+  @enableZoom={{false}}
+  @enablePan='[{}]'
+/>

@@ -2,32 +2,42 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { service } from '@ember/service';
-import { PointLight, PointLightHelper } from 'three';
+import { SpotLight, SpotLightHelper, CameraHelper } from 'three';
 
-export default class ThreeLightPointComponent extends Component {
+export default class ThreeLightSpotComponent extends Component {
   @service cognusScene;
 
   @action
   didInsert() {
-    const pointLight = new PointLight(
+    // color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 1
+    const light = new SpotLight(
       this.color,
       this.intensity,
       this.distance,
+      this.angle,
+      this.penumbra,
       this.decay
     );
 
-    pointLight.position.x = this.position.x;
-    pointLight.position.y = this.position.y;
-    pointLight.position.z = this.position.z;
+    light.position.x = this.position.x;
+    light.position.y = this.position.y;
+    light.position.z = this.position.z;
 
-    pointLight.castShadow = this.castShadow;
+    light.castShadow = this.castShadow;
+
+    light.shadow.focus = 10; // default
+    // light.shadow.scale = 10; // default
+    // light.shadow.blur = 1.5; // default
+    // light.shadow.camera.far = 0.8; // default
+    // light.shadow.focus = 1; // default
+    console.log(light);
 
     this.cognusScene.addComponent({
       type: 'lights',
-      object: pointLight,
+      object: light,
       color: this.color,
       helper() {
-        return new PointLightHelper(pointLight, 2);
+        return new SpotLightHelper(light, 2);
       },
     });
   }
@@ -43,8 +53,15 @@ export default class ThreeLightPointComponent extends Component {
     return this.args.distance || 0;
   }
 
+  get angle() {
+    return this.args.angle || Math.PI / 3;
+  }
+  get penumbra() {
+    return 0;
+  }
+
   get decay() {
-    return this.args.decay || 2;
+    return this.args.decay || 1;
   }
 
   get position() {
@@ -63,7 +80,6 @@ export default class ThreeLightPointComponent extends Component {
       return position;
     }
   }
-
   get castShadow() {
     return this.args.castShadow == false ? false : true;
   }

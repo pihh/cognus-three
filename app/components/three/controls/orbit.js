@@ -21,12 +21,32 @@ export default class ThreeControlsOrbitComponent extends Component {
       init(camera, domElement) {
         orbitControls = new OrbitControls(camera, domElement);
         orbitControls.enableDamping = self.enableDamping;
+        orbitControls.minPolarAngle = self.minPolarAngle;
+        orbitControls.maxPolarAngle = self.maxPolarAngle;
+        orbitControls.enableZoom = self.enableZoom;
+        orbitControls.enablePan = self.enablePan;
         this.object = orbitControls;
+        console.log(this.object);
       },
     });
   }
 
   get enableDamping() {
-    return this.args.enableDamping || true;
+    return this.args.enableDamping == false ? false : true;
+  }
+  get minPolarAngle() {
+    return this.args.minPolarAngle || 0;
+  }
+  get maxPolarAngle() {
+    return this.args.maxPolarAngle || Math.PI;
+  }
+  get enableZoom() {
+    return this.args.enableZoom == false ? false : true;
+  }
+  get enablePan() {
+    console.log(this.args.enablePan);
+    return this.args.enablePan == false ? false : true;
   }
 }
+
+// minPolarAngle={Math.PI / 2} maxPolarAngle={Math.PI / 2} enableZoom={false} enablePan={false}

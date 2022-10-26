@@ -25,7 +25,7 @@ export default class ObjectsSphereComponent extends Component {
     // Mesh
     const sphere = new Mesh(geometry, material);
     const cognusScene = this.cognusScene;
-
+    sphere.castShadow = true;
     this.cognusScene.addComponent({
       type: 'objects',
       object: sphere,

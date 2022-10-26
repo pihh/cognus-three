@@ -64,6 +64,13 @@ export default class ObjectsShoeComponent extends Component {
       // called when the resource is loaded
       (gltf) => {
         // console.log({ gltf });
+        gltf.scene.traverse(function (child) {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.recieveShadow = false;
+          }
+        });
+
         this.gltf = gltf;
         this.meshes = gltf.scene.children[0].children;
 
@@ -125,6 +132,7 @@ export default class ObjectsShoeComponent extends Component {
               };
               // Add onClick events
               for (let mesh of meshes) {
+                mesh.castShadow = true;
                 mesh.rootUUID = this.object.uuid;
                 mesh.click = (e) => {
                   this.intersected = true;
@@ -138,6 +146,8 @@ export default class ObjectsShoeComponent extends Component {
                   this.intersected = mesh;
                   this.hover(e);
                 };
+
+                console.log({ mesh });
               }
             },
             render() {
@@ -162,22 +172,21 @@ export default class ObjectsShoeComponent extends Component {
               };
             },
             hover(e) {
-              console.log('hovering ');
-              this.updateCursor(true);
+              if (this.intersected) {
+                this.updateCursor(true);
+              }
             },
             hoverEnd(e) {
-              console.log('not hovering');
-              this.intersected = false;
-              this.updateCursor();
+              if (this.intersected) {
+                this.intersected = false;
+                this.updateCursor();
+              }
             },
             updateCursor(custom) {
-              console.log(this.intersected);
-
               if (this.intersected) {
                 const name = this.intersected.material.name;
                 const color =
                   '#' + this.intersected.material.color.getHexString();
-                console.log({ name, color });
 
                 const cursor = `
                   <svg width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg">
