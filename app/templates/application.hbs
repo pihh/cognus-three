@@ -5,10 +5,9 @@
     @far={{100}}
   />
 
-  <Three::Light::Point
-    @intensity={{0.1}}
-    @position={{this.pointLightPosition}}
-  />
+  <Three::Light::Ambient @intensity={{1}} />
+  {{!-- <Three::Light::Point @intensity={{1}} @position={{this.pointLightPosition}} />
+  {{!--
   <Three::Light::Point
     @color={{this.pointLightColor2}}
     @intensity={{2}}
@@ -18,12 +17,10 @@
     @intensity={{10}}
     @position={{this.pointLightPosition3}}
   />
+  --}}
 
-  {{!
-  <Objects::Ball />
-  }}
-  <Objects::Sphere />
-
+  <!-- <Objects::Sphere /> -->
+  <Objects::Shoe />
 </CognusScene>
 <Three::Controls::Orbit />
 

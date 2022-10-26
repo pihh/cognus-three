@@ -27,6 +27,9 @@ export default class CognusSceneComponent extends Component {
     });
 
     this.cognusScene.boot();
+    setTimeout(() => {
+      console.log(this.cognusScene);
+    }, 1000);
   }
 
   get background() {

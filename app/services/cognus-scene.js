@@ -19,8 +19,20 @@ export default class CognusSceneService extends Service {
   @tracked canvas = [];
   @tracked objects = [];
 
-  @action addComponent(component) {
+  @action addComponent(
+    component,
+    config = {
+      async: false,
+    }
+  ) {
     this[component.type].push(component);
+    if (config.async) {
+      if (component.init) {
+        component.init();
+      }
+      this.scene.add(component.object);
+      console.log(this);
+    }
   }
 
   @action
@@ -38,6 +50,8 @@ export default class CognusSceneService extends Service {
 
     this.addEventListeners();
     this.addGUI();
+
+    console.log(this.objects);
   }
 
   addGUI() {
