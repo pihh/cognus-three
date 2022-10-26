@@ -2,7 +2,7 @@ import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
-import { WebGLRenderer, Clock } from 'three';
+import { WebGLRenderer, Clock, Raycaster, Vector2 } from 'three';
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
 
@@ -46,6 +46,7 @@ export default class CognusSceneService extends Service {
     this.addCamera();
     this.addRenderer();
     this.addControls();
+    this.addRaycaster();
     this.animate();
 
     this.addEventListeners();
@@ -120,6 +121,11 @@ export default class CognusSceneService extends Service {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   }
 
+  addRaycaster() {
+    this.mouse = new Vector2();
+    this.raycaster = new Raycaster();
+  }
+
   elapsedTime = 0;
   animate() {
     const clock = new Clock();
@@ -164,6 +170,27 @@ export default class CognusSceneService extends Service {
 
     window.addEventListener('scroll', (e) => {
       this.onScroll(e);
+    });
+
+    this.renderer.domElement.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      this.raycaster.setFromCamera(this.mouse, this.camera);
+
+      var intersects = this.raycaster.intersectObject(this.scene, true);
+      console.log({ intersects });
+      // if (intersects.length > 0) {
+      //
+      // 	// var object = intersects[0].object;
+      //   //
+      //   // object.material.color.set( Math.random() * 0xffffff );
+      //
+      // }
+
+      // }
     });
   }
 
