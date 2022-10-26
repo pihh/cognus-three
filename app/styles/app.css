@@ -56,11 +56,3 @@ h1 {
   width: 100vw;
   height: 100vh;
 }
-
-h1 {
-  position: absolute;
-  left: 45%;
-  top: 50vh;
-  color: white;
-  font-size: 5em;
-}

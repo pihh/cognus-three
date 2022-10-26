@@ -160,28 +160,21 @@ export default class CognusSceneService extends Service {
   }
 
   addEventListeners() {
-    window.addEventListener('resize', () => {
+    this.renderer.domElement.addEventListener('resize', () => {
       this.onResize();
     });
 
-    window.addEventListener('mousemove', (e) => {
+    this.renderer.domElement.addEventListener('mousemove', (e) => {
       this.onMouseMove(e);
     });
 
-    window.addEventListener('scroll', (e) => {
+    this.renderer.domElement.addEventListener('scroll', (e) => {
       this.onScroll(e);
     });
 
     this.renderer.domElement.addEventListener('click', (e) => {
-      e.preventDefault();
-
-      this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-      this.raycaster.setFromCamera(this.mouse, this.camera);
-
-      var intersects = this.raycaster.intersectObject(this.scene, true);
-      console.log({ intersects });
+      this.onClick(e);
+      // console.log({ intersects });
       // if (intersects.length > 0) {
       //
       // 	// var object = intersects[0].object;
@@ -197,15 +190,63 @@ export default class CognusSceneService extends Service {
   mouseX = 0;
   mouseY = 0;
   onMouseMove(e) {
+    e.stopPropagation();
+    this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
     let windowHalfX = window.innerWidth / 2;
     let windowHalfY = window.innerHeight / 2;
 
     this.mouseX = e.clientX - windowHalfX;
     this.mouseY = e.clientY - windowHalfY;
+
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+
+    this.intersects = this.raycaster.intersectObject(this.scene, true);
+
+    for (let object of this.objects) {
+      object.intersected = false;
+    }
+    if (this.intersects.length > 0) {
+      const meshUUID =
+        this.intersects[0].object.rootUUID || this.intersects[0].object.uuid;
+      for (let object of this.objects) {
+        const objUUID = object.object.uuid;
+        if (meshUUID == objUUID) {
+          object.object.intersected = true;
+          this.intersects[0].object.hover(e);
+        } else {
+          object.object.intersected = false;
+        }
+      }
+    } else {
+      for (let object of this.objects) {
+        object.object.intersected = false;
+      }
+    }
+    this.onMouseOver();
   }
 
+  onMouseOver(e) {
+    for (let object of this.objects) {
+      if (!object.object.intersected && object.hoverEnd) {
+        object.hoverEnd(e);
+      }
+    }
+  }
+
+  onClick(e) {
+    if (this.intersects.length > 0) {
+      this.intersects[0].object.click(e);
+    } else {
+      for (let object of this.objects) {
+        if (object.clickOutside) {
+          object.clickOutside(e);
+        }
+      }
+    }
+  }
   onScroll(e) {
-    console.log('scroll');
     for (let object of this.objects) {
       if (object.scroll) {
         object.scroll(e);

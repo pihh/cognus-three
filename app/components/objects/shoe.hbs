@@ -1,1 +1,8 @@
 {{three-loader this.didInsert}}
+
+{{#in-element this.destinationElement}}
+  <ColorPicker
+    @current={{this.state.current}}
+    @onColorChange={{this.onColorChange}}
+  />
+{{/in-element}}
