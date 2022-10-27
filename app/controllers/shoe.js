@@ -1,6 +1,6 @@
 import Controller from '@ember/controller';
 
-export default class ApplicationController extends Controller {
+export default class ShoeController extends Controller {
   cameraPosition = {
     x: 0,
     y: 0,
@@ -14,9 +14,9 @@ export default class ApplicationController extends Controller {
   };
 
   spotLight2Position = {
-    x: -200,
-    y: 31,
-    z: 130,
+    x: 19,
+    y: 100,
+    z: 10,
   };
 
   minPolarAngle = Math.PI / 2;

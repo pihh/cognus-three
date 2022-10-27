@@ -19,12 +19,16 @@ export default class ObjectsBallComponent extends Component {
 
     // Mesh
     const sphere = new Mesh(geometry, material);
+    const cognusScene = this.cognusScene;
 
     this.cognusScene.addComponent({
       type: 'objects',
       object: sphere,
       render: (scene) => {
         sphere.rotation.y = 0.5 * scene.elapsedTime;
+      },
+      init() {
+        cognusScene.pubsub.publish('object-initialized', this.object);
       },
     });
   }

@@ -5,6 +5,7 @@ import { service } from '@ember/service';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { Color } from 'three';
+
 function makeid() {
   var length = 10;
   var result = '';
@@ -133,6 +134,12 @@ export default class ObjectsShoeComponent extends Component {
               // Add onClick events
               for (let mesh of meshes) {
                 mesh.castShadow = true;
+                if (mesh.material.metalness < 1) {
+                  mesh.material.metalness = 0;
+                  mesh.material.roughness = 0;
+                }
+                // mesh.material.map = textureFloor;
+                mesh.material.needsUpdate = true;
                 mesh.rootUUID = this.object.uuid;
                 mesh.click = (e) => {
                   this.intersected = true;
@@ -146,9 +153,8 @@ export default class ObjectsShoeComponent extends Component {
                   this.intersected = mesh;
                   this.hover(e);
                 };
-
-                console.log({ mesh });
               }
+              cognusScene.pubsub.publish('object-initialized', this.object);
             },
             render() {
               // Floating animation

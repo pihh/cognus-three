@@ -1,6 +1,7 @@
 import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
+import CognusPubSub from '../utils/cognus-pubsub';
 
 import {
   WebGLRenderer,
@@ -14,6 +15,7 @@ import * as THREE from 'three';
 import * as dat from 'dat.gui';
 
 export default class CognusSceneService extends Service {
+  loading = true;
   config = {
     resizeCamera: true,
     gui: false,
@@ -25,13 +27,26 @@ export default class CognusSceneService extends Service {
   @tracked scenes = [];
   @tracked canvas = [];
   @tracked objects = [];
+  @tracked shadowGroups = [];
 
-  @action addComponent(
-    component,
-    config = {
-      async: false,
-    }
-  ) {
+  constructor() {
+    super(...arguments);
+    this.addPubSub();
+  }
+
+  reset() {
+    this.cameras = [];
+    this.controls = [];
+    this.lights = [];
+    this.scenes = [];
+    this.canvas = [];
+    this.objects = [];
+    this.shadowGroups = [];
+    this.loading = true;
+  }
+
+  @action
+  addComponent(component, config = { async: false }) {
     this[component.type].push(component);
     if (config.async) {
       if (component.init) {
@@ -131,39 +146,6 @@ export default class CognusSceneService extends Service {
     this.raycaster = new Raycaster();
   }
 
-  elapsedTime = 0;
-  animate() {
-    const clock = new Clock();
-
-    const tick = () => {
-      this.elapsedTime = clock.getElapsedTime();
-      // console.log({ elapsedTime });
-      // Update objects
-      // sphere.rotation.y = .5 * elapsedTime
-
-      for (let object of this.objects) {
-        try {
-          object.render();
-        } catch (ex) {
-          console.warn(ex);
-        }
-      }
-
-      // Update Orbital Controls
-      for (let control of this.controls) {
-        control.render();
-      }
-
-      // Render
-      this.renderer.render(this.scene, this.camera);
-
-      // Call tick again on the next frame
-      window.requestAnimationFrame(tick);
-    };
-
-    tick();
-  }
-
   addEventListeners() {
     window.addEventListener('resize', () => {
       this.onResize();
@@ -190,6 +172,60 @@ export default class CognusSceneService extends Service {
 
       // }
     });
+  }
+
+  addPubSub() {
+    this.pubsub = CognusPubSub.create();
+    this.pubsub.subscribe('object-initialized', (obj) => {
+      // TODO
+      // console.log('object has been initialized', obj);
+      // obj.loaded = true;
+      // for (let object of this.objects) {
+      //   console.log(object.object.loaded, this.objects.length);
+      // }
+    });
+  }
+
+  onMouseOver(e) {
+    for (let object of this.objects) {
+      if (!object.object.intersected && object.hoverEnd) {
+        object.hoverEnd(e);
+      }
+    }
+  }
+
+  onClick(e) {
+    if (this.intersects.length > 0) {
+      if (this.intersects[0].object.click) {
+        this.intersects[0].object.click(e);
+      }
+    } else {
+      for (let object of this.objects) {
+        if (object.clickOutside) {
+          object.clickOutside(e);
+        }
+      }
+    }
+  }
+
+  onScroll(e) {
+    for (let object of this.objects) {
+      if (object.scroll) {
+        object.scroll(e);
+      }
+    }
+  }
+
+  onResize() {
+    // Update sizes
+
+    // Update camera
+    this.camera.aspect = this.sizes.width / this.sizes.height;
+    this.camera.updateProjectionMatrix();
+
+    // Update renderer
+    this.renderer.setSize(this.sizes.width, this.sizes.height);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   }
 
   mouseX = 0;
@@ -234,46 +270,38 @@ export default class CognusSceneService extends Service {
     this.onMouseOver();
   }
 
-  onMouseOver(e) {
-    for (let object of this.objects) {
-      if (!object.object.intersected && object.hoverEnd) {
-        object.hoverEnd(e);
-      }
-    }
-  }
+  elapsedTime = 0;
+  animate() {
+    const clock = new Clock();
 
-  onClick(e) {
-    if (this.intersects.length > 0) {
-      if (this.intersects[0].object.click) {
-        this.intersects[0].object.click(e);
-      }
-    } else {
+    const tick = () => {
+      this.elapsedTime = clock.getElapsedTime();
+      // console.log({ elapsedTime });
+      // Update objects
+      // sphere.rotation.y = .5 * elapsedTime
+
       for (let object of this.objects) {
-        if (object.clickOutside) {
-          object.clickOutside(e);
+        try {
+          object.render();
+        } catch (ex) {
+          console.warn(ex);
         }
       }
-    }
-  }
-  onScroll(e) {
-    for (let object of this.objects) {
-      if (object.scroll) {
-        object.scroll(e);
+
+      // Update Orbital Controls
+      for (let control of this.controls) {
+        control.render();
       }
-    }
+
+      // Render
+      this.renderer.render(this.scene, this.camera);
+
+      // Call tick again on the next frame
+      window.requestAnimationFrame(tick);
+    };
+
+    tick();
   }
-
-  onResize = () => {
-    // Update sizes
-
-    // Update camera
-    this.camera.aspect = this.sizes.width / this.sizes.height;
-    this.camera.updateProjectionMatrix();
-
-    // Update renderer
-    this.renderer.setSize(this.sizes.width, this.sizes.height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  };
 
   get sizes() {
     return {

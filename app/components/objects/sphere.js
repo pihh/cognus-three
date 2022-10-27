@@ -35,6 +35,8 @@ export default class ObjectsSphereComponent extends Component {
         cognusScene.targetY = 0;
         this.arguments.push({ targetX: cognusScene.targetX });
         this.arguments.push({ targetY: cognusScene.targetY });
+
+        cognusScene.pubsub.publish('object-initialized', this.object);
       },
       render() {
         cognusScene.targetX = cognusScene.mouseX * 0.001;

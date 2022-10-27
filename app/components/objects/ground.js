@@ -10,22 +10,25 @@ export default class ObjectsGroundComponent extends Component {
   @action
   didInsert() {
     // Objects
+    const cognusScene = this.cognusScene;
     const ground = new Mesh(
       new PlaneBufferGeometry(8, 8),
       new MeshPhongMaterial({ color: this.color, depthWrite: false })
     );
-    ground.rotation.x = -Math.PI / 2.1;
+    ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = this.recieveShadow;
     ground.castShadow = this.castShadow;
     ground.transparent = true;
     ground.position.y = -0.8;
 
-    console.log({ ground });
     this.cognusScene.addComponent({
       type: 'objects',
       object: ground,
       render(obj) {
         // sphere.rotation.y = 0.5 * scene.elapsedTime;
+      },
+      init() {
+        cognusScene.pubsub.publish('object-initialized', this.object);
       },
     });
   }
