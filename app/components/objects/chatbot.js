@@ -51,7 +51,7 @@ export default class ObjectsChatbotComponent extends Component {
               tl.to(this.object.rotation, { y: 4.2, duration: 1 }, '-=1');
             },
             render() {
-              // this.object.rotation.set(0, this.object.rotation.y + 0.025, 0);
+              this.object.rotation.set(0, this.object.rotation.y + 0.015, 0);
             },
           },
           { async: true }

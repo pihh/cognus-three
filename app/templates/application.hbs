@@ -1,36 +1,78 @@
-<CognusScene>
-  <Three::Camera::Perspective
-    @fov={{50}}
-    @position={{this.cameraPosition}}
-    @far={{1000}}
+<div
+  style='position: absolute;
+top: 250px;
+left: 250px;
+padding: 0;
+margin: 40px;
+line-height: 0.7em;
+color: #272730;
+max-width: 500px
+'
+>
+  <h1 style='position:initial; margin:0'>Bluedarwin
+    <p style='margin-top:0.2em'> Chatbot</p></h1>
+  <p style='padding-top:2em; line-height: 1.1em'>Lorem ipsum dolor sit amet,
+    consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+    ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+</div>
+
+{{#if this.splash}}
+  <div
+    class='splash'
+    style='height: 100vh;
+    width: 100vw;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 1.2s;
+    opacity:1;
+    z-index: 1
+    '
+  >
+    <div style='margin-top:-10em'>
+      <img src='logo.png' style='height:5em; margin-top: -2em' />
+    </div>
+  </div>
+
+{{else}}
+
+  <CognusScene>
+    <Three::Camera::Perspective
+      @fov={{50}}
+      @position={{this.cameraPosition}}
+      @far={{1000}}
+    />
+
+    <Three::Light::Ambient @intensity={{0.5}} />
+    <Three::Light::Spot
+      @intensity={{0.5}}
+      @angle={{0.1}}
+      @penumbra={{1}}
+      @position={{this.spotLightPosition}}
+      @castShadow={{true}}
+    />
+
+    <Three::Light::Spot
+      @intensity={{0.5}}
+      @angle={{0.1}}
+      @penumbra={{1}}
+      @position={{this.spotLight2Position}}
+      @castShadow={{true}}
+    />
+    <Three::ContactShadows>
+      <Objects::Chatbot />
+      <!-- <Objects::Shoe /> -->
+      {{! <Objects::Ground /> }}
+    </Three::ContactShadows>
+    {{! <Objects::Environment /> }}
+  </CognusScene>
+  <Three::Controls::Orbit
+    @minPolarAngle={{this.minPolarAngle}}
+    @maxPolarAngle={{this.maxPolarAngle}}
+    @enableZoom={{false}}
+    @enablePan='[{}]'
   />
 
-  <Three::Light::Ambient @intensity={{0.5}} />
-  <Three::Light::Spot
-    @intensity={{0.5}}
-    @angle={{0.1}}
-    @penumbra={{1}}
-    @position={{this.spotLightPosition}}
-    @castShadow={{true}}
-  />
-
-  <Three::Light::Spot
-    @intensity={{0.5}}
-    @angle={{0.1}}
-    @penumbra={{1}}
-    @position={{this.spotLight2Position}}
-    @castShadow={{true}}
-  />
-  <Three::ContactShadows>
-    <Objects::Chatbot />
-    <!-- <Objects::Shoe /> -->
-    {{! <Objects::Ground /> }}
-  </Three::ContactShadows>
-  {{! <Objects::Environment /> }}
-</CognusScene>
-<Three::Controls::Orbit
-  @minPolarAngle={{this.minPolarAngle}}
-  @maxPolarAngle={{this.maxPolarAngle}}
-  @enableZoom={{false}}
-  @enablePan='[{}]'
-/>
+{{/if}}

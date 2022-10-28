@@ -10,10 +10,21 @@ body,
   outline: none;
   width: 100vw;
   height: 100vh;
+  /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#ffffff+11,f2f2f7+98 */
+  background: #ffffff;
+  /* Old browsers */
+  background: -moz-linear-gradient(top, #ffffff 11%, #f2f2f7 98%);
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, #ffffff 11%, #f2f2f7 98%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, #ffffff 11%, #f2f2f7 98%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#f2f2f7', GradientType=0);
+  /* IE6-9 */
 }
 
 body {
-  background: white;
+  /* background: white; */
   font-family: "Inter var", sans-serif;
   display: flex;
   justify-content: center;
